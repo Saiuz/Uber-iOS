@@ -14,6 +14,12 @@ import FirebaseDatabase
 class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapa: MKMapView!
     @IBOutlet weak var botaoChamarUber: UIButton!
+    
+    // Outlets
+    @IBOutlet weak var areaEndereco: UIView!
+    @IBOutlet weak var marcadorLocalPassageiro: UIView!
+    @IBOutlet weak var marcadorLocalDestino: UIView!
+    
     var gerenciadorLocalizacao = CLLocationManager()
     var localUsuario = CLLocationCoordinate2D()
     var localMotorista = CLLocationCoordinate2D()
@@ -31,6 +37,15 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
         gerenciadorLocalizacao.desiredAccuracy = kCLLocationAccuracyBest // Seta a precisão de localização do usuário
         gerenciadorLocalizacao.requestWhenInUseAuthorization() // Solicita autorização do usuário para usar a sua localização
         gerenciadorLocalizacao.startUpdatingLocation() // Começa a atualizar a localização do usuário
+        
+        // Configura arredondamento dos marcadores
+        self.marcadorLocalPassageiro.layer.cornerRadius = 7.5
+        self.marcadorLocalPassageiro.clipsToBounds = true
+        self.marcadorLocalDestino.layer.cornerRadius = 7.5
+        self.marcadorLocalDestino.clipsToBounds = true
+        
+        self.areaEndereco.layer.cornerRadius = 10
+        self.areaEndereco.clipsToBounds = true
         
         // Verifica se o usuário já tem uma requisição de Uber
         if let emailUsuario = Auth.auth().currentUser?.email {

@@ -350,15 +350,86 @@
                                     <action selector="chamarUber:" destination="eDW-vT-7it" eventType="touchUpInside" id="UdL-cq-K8I"/>
                                 </connections>
                             </button>
+                            <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xhI-dK-lMw">
+                                <rect key="frame" x="16" y="74" width="343" height="81"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="M2e-ht-FvV">
+                                        <rect key="frame" x="16" y="10" width="311" height="61"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="YSs-XT-AB7">
+                                                <rect key="frame" x="0.0" y="0.0" width="311" height="25"/>
+                                                <subviews>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Bzr-HM-VZf">
+                                                        <rect key="frame" x="0.0" y="5" width="15" height="15"/>
+                                                        <color key="backgroundColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="15" id="FFU-Sx-Nyg"/>
+                                                            <constraint firstAttribute="height" constant="15" id="VzI-yo-AFA"/>
+                                                        </constraints>
+                                                    </view>
+                                                    <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Meu local" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zfx-Yv-ivw">
+                                                        <rect key="frame" x="23" y="2" width="288" height="21"/>
+                                                        <nil key="textColor"/>
+                                                        <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="15"/>
+                                                        <textInputTraits key="textInputTraits"/>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="7bb-BX-j7o"/>
+                                                </constraints>
+                                            </stackView>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YXF-8h-CNe">
+                                                <rect key="frame" x="0.0" y="30" width="311" height="1"/>
+                                                <color key="backgroundColor" red="0.83741801979999997" green="0.83743780850000005" blue="0.83742713930000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="1" id="KH6-k6-2cs"/>
+                                                </constraints>
+                                            </view>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="4ag-ye-lE9">
+                                                <rect key="frame" x="0.0" y="36" width="311" height="25"/>
+                                                <subviews>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UhI-Dr-IWf">
+                                                        <rect key="frame" x="0.0" y="5" width="15" height="15"/>
+                                                        <color key="backgroundColor" red="0.75406885150000003" green="0.75408679249999999" blue="0.75407713649999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="15" id="Csz-AC-5Cg"/>
+                                                            <constraint firstAttribute="width" constant="15" id="cag-iF-alw"/>
+                                                        </constraints>
+                                                    </view>
+                                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Digite seu destino" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Du1-fe-Oi9">
+                                                        <rect key="frame" x="23" y="2" width="288" height="21"/>
+                                                        <nil key="textColor"/>
+                                                        <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="15"/>
+                                                        <textInputTraits key="textInputTraits"/>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="jfY-1v-Tet"/>
+                                                </constraints>
+                                            </stackView>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="M2e-ht-FvV" secondAttribute="trailing" constant="16" id="daZ-n6-Zc1"/>
+                                    <constraint firstAttribute="bottom" secondItem="M2e-ht-FvV" secondAttribute="bottom" constant="10" id="eM3-hg-TRf"/>
+                                    <constraint firstItem="M2e-ht-FvV" firstAttribute="top" secondItem="xhI-dK-lMw" secondAttribute="top" constant="10" id="hXd-0c-YNs"/>
+                                    <constraint firstItem="M2e-ht-FvV" firstAttribute="leading" secondItem="xhI-dK-lMw" secondAttribute="leading" constant="16" id="pWp-yV-fbW"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="S7F-sO-0y3" firstAttribute="trailing" secondItem="ZDa-tt-3Ec" secondAttribute="trailing" id="0ZD-N2-igC"/>
+                            <constraint firstItem="xhI-dK-lMw" firstAttribute="top" secondItem="ZDa-tt-3Ec" secondAttribute="top" constant="10" id="7Yw-Nd-sx5"/>
                             <constraint firstItem="lBU-83-SCW" firstAttribute="top" secondItem="ZDa-tt-3Ec" secondAttribute="top" id="Csl-RP-hCb"/>
                             <constraint firstItem="lBU-83-SCW" firstAttribute="bottom" secondItem="ZDa-tt-3Ec" secondAttribute="bottom" id="Sg8-ZR-tjs"/>
                             <constraint firstItem="lBU-83-SCW" firstAttribute="trailing" secondItem="ZDa-tt-3Ec" secondAttribute="trailing" id="VUf-Kh-2V6"/>
+                            <constraint firstItem="xhI-dK-lMw" firstAttribute="leading" secondItem="ZDa-tt-3Ec" secondAttribute="leading" constant="16" id="XSt-gC-7w1"/>
                             <constraint firstItem="S7F-sO-0y3" firstAttribute="leading" secondItem="ZDa-tt-3Ec" secondAttribute="leading" id="g8M-Ye-TGJ"/>
                             <constraint firstItem="lBU-83-SCW" firstAttribute="leading" secondItem="ZDa-tt-3Ec" secondAttribute="leading" id="iVA-gY-hz1"/>
+                            <constraint firstItem="ZDa-tt-3Ec" firstAttribute="trailing" secondItem="xhI-dK-lMw" secondAttribute="trailing" constant="16" id="jUg-86-3tL"/>
                             <constraint firstItem="S7F-sO-0y3" firstAttribute="bottom" secondItem="ZDa-tt-3Ec" secondAttribute="bottom" id="kdc-Bq-GYm"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ZDa-tt-3Ec"/>
@@ -371,13 +442,16 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="areaEndereco" destination="xhI-dK-lMw" id="WAI-8j-qhZ"/>
                         <outlet property="botaoChamarUber" destination="S7F-sO-0y3" id="qa7-c0-ppw"/>
                         <outlet property="mapa" destination="lBU-83-SCW" id="wcy-Ko-QiP"/>
+                        <outlet property="marcadorLocalDestino" destination="UhI-Dr-IWf" id="vDf-0w-22n"/>
+                        <outlet property="marcadorLocalPassageiro" destination="Bzr-HM-VZf" id="V9D-Ju-Fzx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bol-Bv-xEj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3338" y="-190"/>
+            <point key="canvasLocation" x="3336.8000000000002" y="-190.25487256371815"/>
         </scene>
         <!--Requisições-->
         <scene sceneID="GXR-SC-9RP">
