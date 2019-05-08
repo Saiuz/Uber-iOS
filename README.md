@@ -1,2 +1,2 @@
-# Uber---iOS
-App "clone" do Uber para iOS para estudo de Swift 4.
+# Uber - iOS
+App "clone" do Uber para iOS feito para estudo de programação nativa em iOS com Swift4.
