@@ -29,6 +29,19 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
         gerenciadorLocalizacao.desiredAccuracy = kCLLocationAccuracyBest // Seta a precisão de localização do usuário
         gerenciadorLocalizacao.requestWhenInUseAuthorization() // Solicita autorização do usuário para usar a sua localização
         gerenciadorLocalizacao.startUpdatingLocation() // Começa a atualizar a localização do usuário
+        
+        // Verifica se o usuário já tem uma requisição de Uber
+        if let emailUsuario = Auth.auth().currentUser?.email {
+            let requisicoes = Database.database().reference().child("requisicoes")
+            // Faz uma query no database ordenando a pesquisa por e-mail e em seguida filtrando pelo e-mail do usuário logado
+            let consultaRequisicoes = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: emailUsuario)
+            
+            consultaRequisicoes.observe(.childAdded) { (snapshot) in
+                if snapshot.value != nil {
+                    self.configBotaoCancelarUber()
+                }
+            }
+        }
     }
     
     // Método utilizado para atualizar a localização do usuário
