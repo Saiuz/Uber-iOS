@@ -444,6 +444,7 @@
                     <connections>
                         <outlet property="areaEndereco" destination="xhI-dK-lMw" id="WAI-8j-qhZ"/>
                         <outlet property="botaoChamarUber" destination="S7F-sO-0y3" id="qa7-c0-ppw"/>
+                        <outlet property="enderecoDestinoCampo" destination="Du1-fe-Oi9" id="Lwy-cD-NSZ"/>
                         <outlet property="mapa" destination="lBU-83-SCW" id="wcy-Ko-QiP"/>
                         <outlet property="marcadorLocalDestino" destination="UhI-Dr-IWf" id="vDf-0w-22n"/>
                         <outlet property="marcadorLocalPassageiro" destination="Bzr-HM-VZf" id="V9D-Ju-Fzx"/>

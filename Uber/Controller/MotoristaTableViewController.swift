@@ -34,6 +34,18 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
             self.tableView.reloadData() // Recarrega novamente os dados da tableView
         }
         
+        // Limpa requisicao caso usuário cancele
+        requisicoes.observe(.childRemoved) { (snapshot) in
+            var indice = 0
+            // Percorrea a lista de requisições comparando cada requisição com a requisição removida
+            for requisicao in self.listaRequisicoes {
+                if requisicao.key == snapshot.key {
+                    self.listaRequisicoes.remove(at: indice) // Ao achar a requisição removida, remove-a da lista de requisições
+                }
+                indice = indice + 1
+            }
+        }
+        
         self.tableView.reloadData()
     }
     

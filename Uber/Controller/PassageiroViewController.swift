@@ -14,6 +14,7 @@ import FirebaseDatabase
 class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapa: MKMapView!
     @IBOutlet weak var botaoChamarUber: UIButton!
+    @IBOutlet weak var enderecoDestinoCampo: UITextField!
     
     // Outlets
     @IBOutlet weak var areaEndereco: UIView!
@@ -164,7 +165,6 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
                     snapshot.ref.removeValue()
                 }
             } else { //Uber não foi chamado
-                self.configBotaoCancelarUber() // Alterna a configuração do botão para cancelarUber
                 self.salvarRequisicao()
             }
         } else {
@@ -177,21 +177,77 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
         
         if let idUsuario = Auth.auth().currentUser?.uid {
             if let emailUsuario = Auth.auth().currentUser?.email {
-                // Recupera nome do usuário
-                let usuarios = Database.database().reference().child("usuarios").child(idUsuario)
-                usuarios.observeSingleEvent(of: .value) { (snapshot) in
-                    let dados = snapshot.value as? NSDictionary
-                    let nomeUsuario = dados!["nome"] as? String
-                    
-                    // Salva os dados da requisição
-                    let dadosUsuario = [
-                        "email" : emailUsuario,
-                        "nome" : nomeUsuario,
-                        "latitude" : self.localUsuario.latitude,
-                        "longitude" : self.localUsuario.longitude
-                        ] as [String : Any]
-                    
-                    requisicao.childByAutoId().setValue(dadosUsuario) // childByAutoId(): Gera um identificador único no firebase
+                if let enderecoDestino = self.enderecoDestinoCampo.text {
+                    if enderecoDestino != "" {
+                        // Recupera os dados do endereço digitado (rua, cidade, cep e etx)
+                        CLGeocoder().geocodeAddressString(enderecoDestino) { (local, erro) in
+                            if erro == nil {
+                                if let dadosLocal = local?.first {
+                                    var rua = ""
+                                    if dadosLocal.thoroughfare != nil {
+                                        rua = dadosLocal.thoroughfare!
+                                    }
+                                    var numero = ""
+                                    if dadosLocal.subThoroughfare != nil {
+                                        numero = dadosLocal.subThoroughfare!
+                                    }
+                                    var bairro = ""
+                                    if dadosLocal.subLocality != nil {
+                                        bairro = dadosLocal.subLocality!
+                                    }
+                                    var cidade = ""
+                                    if dadosLocal.locality != nil {
+                                        cidade = dadosLocal.locality!
+                                    }
+                                    var cep = ""
+                                    if dadosLocal.postalCode != nil {
+                                        cep = dadosLocal.postalCode!
+                                    }
+                                    
+                                    let enderecoCompleto = "\(rua), \(numero), \(bairro) - \(cidade) - \(cep)"
+                                    if let latDestino = dadosLocal.location?.coordinate.latitude {
+                                        if let lonDestino = dadosLocal.location?.coordinate.longitude {
+                                            
+                                            // Cria um alert para usuário confirmar se o local recuperado está correto
+                                            let alerta = UIAlertController(title: "Confirme o seu endereço", message: enderecoCompleto, preferredStyle: .alert)
+                                            let acaoCancelar = UIAlertAction(title: "Cancelar", style: .cancel, handler: nil)
+                                            let acaoConfirmar = UIAlertAction(title: "Confirmar", style: .default, handler: { (alertAction) in
+                                                
+                                                // Recupera nome do usuário
+                                                let usuarios = Database.database().reference().child("usuarios").child(idUsuario)
+                                                
+                                                usuarios.observeSingleEvent(of: .value) { (snapshot) in
+                                                    let dados = snapshot.value as? NSDictionary
+                                                    let nomeUsuario = dados!["nome"] as? String
+                                                    
+                                                    // Salva os dados da requisição
+                                                    let dadosUsuario = [
+                                                        "destinoLatitude" : latDestino,
+                                                        "destinoLongitude" : lonDestino,
+                                                        "email" : emailUsuario,
+                                                        "nome" : nomeUsuario,
+                                                        "latitude" : self.localUsuario.latitude,
+                                                        "longitude" : self.localUsuario.longitude
+                                                        ] as [String : Any]
+                                                    
+                                                    requisicao.childByAutoId().setValue(dadosUsuario) // childByAutoId(): Gera um identificador único no firebase
+                                                    
+                                                    // Alterna para o botão de cancelar
+                                                    self.configBotaoCancelarUber() // Alterna a configuração do botão para cancelarUber
+                                                }
+                                            })
+                                            
+                                            alerta.addAction(acaoCancelar)
+                                            alerta.addAction(acaoConfirmar)
+                                            self.present(alerta, animated: true, completion: nil)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        print("Endereço não digitado")
+                    }
                 }
             }
         }
