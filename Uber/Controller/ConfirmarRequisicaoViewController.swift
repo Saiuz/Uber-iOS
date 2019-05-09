@@ -16,9 +16,10 @@ enum StatusCorrida: String {
     case EmRequisicao, PegarPassageiro, IniciarViagem, EmViagem
 }
 
-class ConfirmarRequisicaoViewController: UIViewController {
+class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapa: MKMapView!
     @IBOutlet weak var botaAaceitarCorrida: UIButton!
+    var gerenciadorLocalizacao = CLLocationManager()
     
     var nomePassageiro = ""
     var emailPassageiro = ""
@@ -29,6 +30,12 @@ class ConfirmarRequisicaoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Configura o gerenciador de localização do Motorista
+        gerenciadorLocalizacao.delegate = self // Seta que a classe vai gerenciar os recursos de localização
+        gerenciadorLocalizacao.desiredAccuracy = kCLLocationAccuracyBest // Seta a precisão de localização do usuário
+        gerenciadorLocalizacao.requestWhenInUseAuthorization() // Solicita autorização do usuário para usar a sua localização
+        gerenciadorLocalizacao.startUpdatingLocation() // Começa a atualizar a localização do usuário
         
         // Configura área inicial do mapa
         let regiao = MKCoordinateRegion(center: self.localPassageiro, latitudinalMeters: 200, longitudinalMeters: 200)
@@ -41,6 +48,42 @@ class ConfirmarRequisicaoViewController: UIViewController {
         anotacaoPassageiro.coordinate = self.localPassageiro
         anotacaoPassageiro.title = self.nomePassageiro
         mapa.addAnnotation(anotacaoPassageiro)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // Recupera a coordenada do motorista
+        if let coordenadas = manager.location?.coordinate {
+            self.localMotorista = coordenadas
+            self.atualizarLocalMotorista()
+        }
+    }
+    
+    func atualizarLocalMotorista() {
+        // Atualizar a localização do motorista no firebase
+        let requisicoes = Database.database().reference().child("requisicoes")
+        
+        if self.emailPassageiro != "" {
+            // Recupera a requisição através do e-mail do usuário
+            let consultaRequisicoes = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro)
+            consultaRequisicoes.observeSingleEvent(of: .childAdded) { (snapshot) in
+                if let dados = snapshot.value as? [String: Any] {
+                    if let statusR = dados["status"] as? String {
+                        
+                        // Status pegarPassageiro
+                        if statusR == StatusCorrida.PegarPassageiro.rawValue { // rawValue para converter o enum em String
+                            let dadosMotorista = [
+                                "motoristaLatitude" : self.localMotorista.latitude,
+                                "motoristaLongitude" : self.localMotorista.longitude
+                            ]
+                            
+                            // Salvar dados no Database
+                            snapshot.ref.updateChildValues(dadosMotorista)
+                            self.pegarPassageiro()
+                        }
+                    }
+                }
+            }
+        }
     }
     
     @IBAction func aceitarCorrida(_ sender: Any) {
@@ -79,8 +122,6 @@ class ConfirmarRequisicaoViewController: UIViewController {
                     }
                 }
             }
-        } else if true {
-            
         }
     }
     
