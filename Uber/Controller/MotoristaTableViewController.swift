@@ -15,6 +15,7 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
     var listaRequisicoes : [DataSnapshot] = []
     var gerenciadorLocalizacao = CLLocationManager()
     var localMotorista = CLLocationCoordinate2D()
+    var timerControle = Timer() // Timer de atualização de requisições
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,10 +30,11 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
         let requisicoes = Database.database().reference().child("requisicoes")
         
         // Recupera as requisições do Database
-        requisicoes.observe(.childAdded) { (snapshot) in
+        /*requisicoes.observe(.childAdded) { (snapshot) in
             self.listaRequisicoes.append(snapshot)
             self.tableView.reloadData() // Recarrega novamente os dados da tableView
         }
+        */
         
         // Listener responável por verificar se uma requisição foi removida, se sim, remove a requisição da lista
         requisicoes.observe(.childRemoved) { (snapshot) in
@@ -48,8 +50,35 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
         }
     }
     
+    // Método viewDidAppear é executado toda vez que esta view é apresentada ao usuário
     override func viewDidAppear(_ animated: Bool) {
-        self.tableView.reloadData()
+        self.recuperarRequisicoes()
+        
+        // Utiliza o timer para realizar atualizações de requisições
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { (timer) in
+            self.recuperarRequisicoes()
+            self.timerControle = timer
+        }
+    }
+    
+    // Método executado toda vez que esta view deixa de ser apresentada ao usuário
+    override func viewDidDisappear(_ animated: Bool) {
+        // Invalida o timer de atualização de requisições
+        self.timerControle.invalidate()
+    }
+    
+    func recuperarRequisicoes() {
+        // Config database
+        let requisicoes = Database.database().reference().child("requisicoes")
+        
+        // Limpa lista atual de requisições
+        self.listaRequisicoes = []
+        
+        // Recupera as requisições do Database
+        requisicoes.observeSingleEvent(of: .childAdded) { (snapshot) in
+            self.listaRequisicoes.append(snapshot)
+            self.tableView.reloadData() // Recarrega novamente os dados da tableView
+        }
     }
     
     // Atualiza localização do usuário
