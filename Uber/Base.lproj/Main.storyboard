@@ -552,6 +552,7 @@
                         <viewLayoutGuide key="safeArea" id="jc6-k6-ysE"/>
                     </view>
                     <connections>
+                        <outlet property="botaAaceitarCorrida" destination="PUY-y0-WMo" id="38W-Ue-hIl"/>
                         <outlet property="mapa" destination="W8M-LU-dgC" id="XnW-qv-MgJ"/>
                     </connections>
                 </viewController>
