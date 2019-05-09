@@ -165,28 +165,35 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
                 }
             } else { //Uber não foi chamado
                 self.configBotaoCancelarUber() // Alterna a configuração do botão para cancelarUber
-                
-                if let idUsuario = Auth.auth().currentUser?.uid {
-                    // Recupera nome do usuário
-                    let usuarios = Database.database().reference().child("usuarios").child(idUsuario)
-                    usuarios.observeSingleEvent(of: .value) { (snapshot) in
-                        let dados = snapshot.value as? NSDictionary
-                        let nomeUsuario = dados!["nome"] as? String
-                        
-                        // Salva os dados da requisição
-                        let dadosUsuario = [
-                            "email" : emailUsuario,
-                            "nome" : nomeUsuario,
-                            "latitude" : self.localUsuario.latitude,
-                            "longitude" : self.localUsuario.longitude
-                            ] as [String : Any]
-                        
-                        requisicao.childByAutoId().setValue(dadosUsuario) // childByAutoId(): Gera um identificador único no firebase
-                    }
-                }
+                self.salvarRequisicao()
             }
         } else {
             print("Erro")
+        }
+    }
+    
+    func salvarRequisicao() {
+        let requisicao = Database.database().reference().child("requisicoes")
+        
+        if let idUsuario = Auth.auth().currentUser?.uid {
+            if let emailUsuario = Auth.auth().currentUser?.email {
+                // Recupera nome do usuário
+                let usuarios = Database.database().reference().child("usuarios").child(idUsuario)
+                usuarios.observeSingleEvent(of: .value) { (snapshot) in
+                    let dados = snapshot.value as? NSDictionary
+                    let nomeUsuario = dados!["nome"] as? String
+                    
+                    // Salva os dados da requisição
+                    let dadosUsuario = [
+                        "email" : emailUsuario,
+                        "nome" : nomeUsuario,
+                        "latitude" : self.localUsuario.latitude,
+                        "longitude" : self.localUsuario.longitude
+                        ] as [String : Any]
+                    
+                    requisicao.childByAutoId().setValue(dadosUsuario) // childByAutoId(): Gera um identificador único no firebase
+                }
+            }
         }
     }
     
