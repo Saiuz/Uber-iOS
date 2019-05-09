@@ -34,7 +34,7 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
             self.tableView.reloadData() // Recarrega novamente os dados da tableView
         }
         
-        // Limpa requisicao caso usuário cancele
+        // Listener responável por verificar se uma requisição foi removida, se sim, remove a requisição da lista
         requisicoes.observe(.childRemoved) { (snapshot) in
             var indice = 0
             // Percorrea a lista de requisições comparando cada requisição com a requisição removida
@@ -44,8 +44,11 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
                 }
                 indice = indice + 1
             }
+            self.tableView.reloadData() // Recarrega os dados na lista
         }
-        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         self.tableView.reloadData()
     }
     
@@ -88,8 +91,19 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
                     let distanciaMetros = motoristaLocation.distance(from: passageiroLocation)
                     let distanciaFinal = round((distanciaMetros / 1000)) // round - Arredonda um número decimal
                     
-                    celula.textLabel?.text = dados["nome"] as? String // Seta o título da tabela
-                    celula.detailTextLabel?.text = "\(distanciaFinal) KM de distância" // Seta o subtitulo da tabela
+                    var requisicaoMotorista = ""
+                    if let emailMotoristaR = dados["motoristaEmail"] as? String {
+                        if let emailMotoristaLogado = Auth.auth().currentUser?.email {
+                            if emailMotoristaR == emailMotoristaLogado {
+                                requisicaoMotorista = "{ANDAMENTO}"
+                            }
+                        }
+                    }
+                    
+                    if let nomePassageiro = dados["nome"] as? String {
+                        celula.textLabel?.text = "\(nomePassageiro) \(requisicaoMotorista)" // Seta o título da tabela
+                        celula.detailTextLabel?.text = "\(distanciaFinal) KM de distância" // Seta o subtitulo da tabela
+                    }
                 }
             }
         }

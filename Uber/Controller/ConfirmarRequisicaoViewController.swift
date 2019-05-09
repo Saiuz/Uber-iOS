@@ -9,6 +9,7 @@
 import UIKit
 import MapKit
 import FirebaseDatabase
+import FirebaseAuth
 
 class ConfirmarRequisicaoViewController: UIViewController {
     @IBOutlet weak var mapa: MKMapView!
@@ -37,12 +38,16 @@ class ConfirmarRequisicaoViewController: UIViewController {
     @IBAction func aceitarCorrida(_ sender: Any) {
         // Atualizar requisição no database
         let requisicoes = Database.database().reference().child("requisicoes")
-        requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro).observeSingleEvent(of: .childAdded) { (snapshot) in
-            let dadosMotorista = [
-                "motoristaLatitude" : self.localMotorista.latitude,
-                "motoristaLongitude" : self.localMotorista.longitude
-            ]
-            snapshot.ref.updateChildValues(dadosMotorista)
+        
+        if let emailMotorista = Auth.auth().currentUser?.email {
+            requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro).observeSingleEvent(of: .childAdded) { (snapshot) in
+                let dadosMotorista = [
+                    "motoristaEmail" : emailMotorista,
+                    "motoristaLatitude" : self.localMotorista.latitude,
+                    "motoristaLongitude" : self.localMotorista.longitude
+                    ] as [String : Any]
+                snapshot.ref.updateChildValues(dadosMotorista)
+            }
         }
         
         // Exibir o caminho até o passageiro no mapa
