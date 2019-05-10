@@ -380,8 +380,8 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
     }
     
     func configBotaoViagemFinalizada(preco: Double) {
-        self.botaAaceitarCorrida.isEnabled = false
         self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.502, green: 0.502, blue: 0.502, alpha: 1)
+        self.botaAaceitarCorrida.isEnabled = false
         
         // Formata o número
         let nf = NumberFormatter()
@@ -392,5 +392,6 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         let precoFinal = nf.string(from: NSNumber(value: preco))
         
         self.botaAaceitarCorrida.setTitle("Viagem finalizada - R$ " + precoFinal!, for: .normal)
+        print("Executou")
     }
 }
