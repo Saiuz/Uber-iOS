@@ -123,6 +123,11 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                     self.exibeMotoristaPassageiro(lPartida: self.localPassageiro, lDestino: self.localDestino, tPartida: "Sua localização", tDestino: "Destino do Passageiro")
                 }
             }
+        } else if status == StatusCorrida.ViagemFinalizada.rawValue {
+            self.status = .ViagemFinalizada
+            if let preco = dados["precoViagem"] as? Double {
+                self.configBotaoViagemFinalizada(preco: preco)
+            }
         }
     }
     

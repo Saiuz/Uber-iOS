@@ -125,6 +125,12 @@ class MotoristaTableViewController: UITableViewController, CLLocationManagerDele
                         if let emailMotoristaLogado = Auth.auth().currentUser?.email {
                             if emailMotoristaR == emailMotoristaLogado {
                                 requisicaoMotorista = "{ANDAMENTO}"
+                                
+                                if let status = dados["status"] as? String {
+                                    if status == "ViagemFinalizada" {
+                                        requisicaoMotorista = "{FINALIZADA}"
+                                    }
+                                }
                             }
                         }
                     }
