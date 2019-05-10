@@ -396,7 +396,5 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         
         let precoFinal = nf.string(from: NSNumber(value: preco))
         
-        self.botaAaceitarCorrida.setTitle("Viagem finalizada - R$ " + precoFinal!, for: .normal)
-        print("Executou")
-    }
+        self.botaAaceitarCorrida.setTitle("Viagem finalizada - R$ " + precoFinal!, for: .normal)    }
 }

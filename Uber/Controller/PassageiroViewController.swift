@@ -64,12 +64,23 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
             // Adiciona listener para quando algum motorista aceitar a corrida
             consultaRequisicoes.observe(.childChanged) { (snapshot) in
                 if let dados = snapshot.value as? [String: Any] {
-                    if let latMotorista = dados["motoristaLatitude"] {
-                        if let lonMotorista = dados["motoristaLongitude"] {
-                            // Cria a localização do motorista
-                            self.localMotorista = CLLocationCoordinate2D(latitude: latMotorista as! CLLocationDegrees, longitude: lonMotorista as! CLLocationDegrees)
-                            
-                            self.exibirMotoristaPassageiro()
+                    
+                    if let status = dados["status"] as? String {
+                        if status == "PegarPassageiro" {
+                            if let latMotorista = dados["motoristaLatitude"] {
+                                if let lonMotorista = dados["motoristaLongitude"] {
+                                    // Cria a localização do motorista
+                                    self.localMotorista = CLLocationCoordinate2D(latitude: latMotorista as! CLLocationDegrees, longitude: lonMotorista as! CLLocationDegrees)
+                                    
+                                    self.exibirMotoristaPassageiro()
+                                }
+                            }
+                        } else if status == "EmViagem" {
+                            self.configBotaoEmViagem()
+                        } else if status == "ViagemFinalizada" {
+                            if let preco = dados["precoViagem"] as? Double {
+                                self.configBotaoViagemFinalizada(preco: preco)
+                            }
                         }
                     }
                 }
@@ -85,12 +96,20 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
         let passageiroLocation = CLLocation(latitude: self.localUsuario.latitude, longitude: self.localUsuario.longitude)
         
         // Calcular distância entre motorista e passageiro
+        var mensagem = ""
         let distancia = motoristaLocation.distance(from: passageiroLocation)
-        let distanciaFinal = round((distancia/1000)) // Distancia / 1000 = distancia em KM | round arredonda o valor
+        let distanciaKM = distancia / 1000 // Distancia / 1000 = distancia em KM
+        let distanciaFinal = round(distanciaKM) // round arredonda o valor
+        mensagem = "Motorista \(distanciaFinal) KM distante"
+        
+        if distanciaKM < 1 {
+            let distanciaM = round(distancia)
+            mensagem = "Motorista \(distanciaM) M distante"
+        }
         
         // Alterações no botão de chamar Uber
         self.botaoChamarUber.backgroundColor = UIColor(displayP3Red: 0.0, green: 0.800, blue: 0.0, alpha: 1)
-        self.botaoChamarUber.setTitle("Motorista \(distanciaFinal) KM distante", for: .normal)
+        self.botaoChamarUber.setTitle(mensagem, for: .normal)
         
         // Exibir diretamente o passageiro e motorista no mapa
         mapa.removeAnnotations(mapa.annotations)
@@ -263,5 +282,26 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
         self.botaoChamarUber.setTitle("Cancelar Uber", for: .normal)
         self.botaoChamarUber.backgroundColor = UIColor(displayP3Red: 0.831, green: 0.237, blue: 0.146, alpha: 1)
         self.uberChamado = true
+    }
+    
+    func configBotaoEmViagem() {
+        self.botaoChamarUber.setTitle("Em Viagem", for: .normal)
+        self.botaoChamarUber.isEnabled = false
+        self.botaoChamarUber.backgroundColor = UIColor(displayP3Red: 0.502, green: 0.502, blue: 0.502, alpha: 1)
+    }
+    
+    func configBotaoViagemFinalizada(preco: Double) {
+        self.botaoChamarUber.backgroundColor = UIColor(displayP3Red: 0.502, green: 0.502, blue: 0.502, alpha: 1)
+        self.botaoChamarUber.isEnabled = false
+        
+        // Formata o número
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.maximumFractionDigits = 2
+        nf.locale = Locale(identifier: "pt_BR")
+        
+        let precoFinal = nf.string(from: NSNumber(value: preco))
+        
+        self.botaoChamarUber.setTitle("Viagem finalizada - R$ " + precoFinal!, for: .normal)
     }
 }
