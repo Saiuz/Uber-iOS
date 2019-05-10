@@ -64,7 +64,6 @@ class PassageiroViewController: UIViewController, CLLocationManagerDelegate {
             // Adiciona listener para quando algum motorista aceitar a corrida
             consultaRequisicoes.observe(.childChanged) { (snapshot) in
                 if let dados = snapshot.value as? [String: Any] {
-                    
                     if let status = dados["status"] as? String {
                         if status == "PegarPassageiro" {
                             if let latMotorista = dados["motoristaLatitude"] {

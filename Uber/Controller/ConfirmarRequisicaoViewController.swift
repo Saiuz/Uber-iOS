@@ -120,7 +120,7 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                     self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
                     
                     // Exibir local do motorista e o destino
-                    self.exibeMotoristaPassageiro(lPartida: self.localPassageiro, lDestino: self.localDestino, tPartida: "Sua localização", tDestino: "Destino do Passageiro")
+                    self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localDestino, tPartida: "Sua localização", tDestino: "Destino do Passageiro")
                 }
             }
         } else if status == StatusCorrida.ViagemFinalizada.rawValue {
@@ -176,16 +176,16 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                             // Exibir motorista passageiro
                             self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Motorista", tDestino: "Passageiro")
                             
-                            /*
+                        } else if statusR == StatusCorrida.EmViagem.rawValue {
                             if let latDestino = dados["destinoLatitude"] as? Double {
                                 if let lonDestino = dados["destinoLongitude"] as? Double {
                                     // Configura o local de destino
                                     self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
                                     
-                                    
+                                    // Exibir motorista -> destino no mapa
+                                    self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localDestino, tPartida: "Motorista", tDestino: "Destino")
                                 }
                             }
-                            */
                         }
                         
                         let dadosMotorista = [
