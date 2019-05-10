@@ -104,7 +104,25 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
             }
             
             // Exibir motorista passageiro
-            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Motorista", tDestino: "Passageiro")
+            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Sua localização", tDestino: "Passageiro")
+            
+        } else if status == StatusCorrida.EmViagem.rawValue {
+            // Altera o status
+            self.status = .EmViagem
+            
+            // Altera o botão
+            self.configBotaoPendenteFinalizarViagem()
+            
+            // Recupera o local de destino
+            if let latDestino = dados["destinoLatitude"] as? Double {
+                if let lonDestino = dados["destinoLongitude"] as? Double {
+                    // Configura o objeto de local de destino
+                    self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
+                    
+                    // Exibir local do motorista e o destino
+                    self.exibeMotoristaPassageiro(lPartida: self.localPassageiro, lDestino: self.localDestino, tPartida: "Sua localização", tDestino: "Destino do Passageiro")
+                }
+            }
         }
     }
     
@@ -303,5 +321,11 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         self.botaAaceitarCorrida.setTitle("Iniciar Viagem", for: .normal)
         self.botaAaceitarCorrida.isEnabled = true
         self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.067, green: 0.576, blue: 0.604, alpha: 1)
+    }
+    
+    func configBotaoPendenteFinalizarViagem() {
+        self.botaAaceitarCorrida.setTitle("Finalizar Viagem", for: .normal)
+        self.botaAaceitarCorrida.isEnabled = true
+        self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.899, green: 0.899, blue: 0.0, alpha: 1)
     }
 }
