@@ -77,6 +77,7 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                         if statusR == StatusCorrida.PegarPassageiro.rawValue { // rawValue para converter o enum em String
                             
                             /* Verifica se o Motorista está próximo, para iniciar a corrida */
+                            
                             // Calcula distância entre motorista e passageiro
                             let motoristaLocation = CLLocation(latitude: self.localMotorista.latitude, longitude: self.localMotorista.longitude)
                             let passageiroLocation = CLLocation(latitude: self.localPassageiro.latitude, longitude: self.localPassageiro.longitude)
@@ -87,17 +88,10 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                             
                             var novoStatus = self.status.rawValue
                             if distanciaKM <= 0.5 {
-                                novoStatus = StatusCorrida.IniciarViagem.rawValue
+                                // Atualizar status
+                                self.atualizarStatusRequisicao(status: StatusCorrida.IniciarViagem.rawValue)
                             }
                             
-                            let dadosMotorista = [
-                                "motoristaLatitude" : self.localMotorista.latitude,
-                                "motoristaLongitude" : self.localMotorista.longitude,
-                                "status" : novoStatus
-                                ] as [String : Any]
-                            
-                            // Salvar dados no Database
-                            snapshot.ref.updateChildValues(dadosMotorista)
                             self.pegarPassageiro()
                             
                             self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Meu local", tDestino: "Passageiro")
@@ -115,6 +109,14 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                                 }
                             }
                         }
+                        
+                        let dadosMotorista = [
+                            "motoristaLatitude" : self.localMotorista.latitude,
+                            "motoristaLongitude" : self.localMotorista.longitude
+                            ] as [String : Any]
+                        
+                        // Salvar dados no Database
+                        snapshot.ref.updateChildValues(dadosMotorista)
                     }
                 }
             }
@@ -191,6 +193,23 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         anotacaoDestino.coordinate = lDestino
         anotacaoDestino.title = tDestino
         mapa.addAnnotation(anotacaoDestino)
+    }
+    
+    func atualizarStatusRequisicao(status: String)  {
+        if status != "" && self.emailPassageiro != "" {
+            let requisicoes = Database.database().reference().child("requisicoes")
+            let consultaRequisicao = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro)
+        
+            consultaRequisicao.observeSingleEvent(of: .childAdded) { (snapshot) in
+                if let dados = snapshot.value as? [String: Any] {
+                    let dadosAtualizar = [
+                        "status" : status
+                    ]
+                    
+                    snapshot.ref.updateChildValues(dadosAtualizar)
+                }
+            }
+        }
     }
     
     func configBotaoPegarPassageiro() {
