@@ -13,7 +13,7 @@ import FirebaseAuth
 
 // Enum = Grupo de constantes
 enum StatusCorrida: String {
-    case EmRequisicao, PegarPassageiro, IniciarViagem, EmViagem
+    case EmRequisicao, PegarPassageiro, IniciarViagem, EmViagem, ViagemFinalizada
 }
 
 class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDelegate {
@@ -234,6 +234,9 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
             }
         } else if self.status == StatusCorrida.IniciarViagem {
             self.iniciarViagemDestino()
+        
+        } else if self.status == StatusCorrida.EmViagem {
+            self.finalizarViagem()
         }
     }
     
@@ -267,6 +270,53 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         
         // Alterna o botão
         self.configBotaoPegarPassageiro()
+    }
+    
+    func finalizarViagem() {
+        // Altera o status
+        self.status = .ViagemFinalizada
+        
+        // Calcula o preço da viagem
+        let precoKM: Double = 4
+        
+        // Recupera dados para atualizar preco
+        let requisicoes = Database.database().reference().child("requisicoes")
+        let consultaRequisicoes = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro)
+        
+        consultaRequisicoes.observeSingleEvent(of: .childAdded) { (snapshot) in
+            if let dados = snapshot.value as? [String : Any] {
+                if let latI = dados["latitude"] as? Double {
+                    if let lonI = dados["longitude"] as? Double {
+                        if let latD = dados["destinoLatitude"] as? Double {
+                            if let lonD = dados["destinoLongitude"] as? Double {
+                                // Cria locations com as latitudes para calcular a distancia
+                                let inicioLocation = CLLocation(latitude: latI, longitude: lonI)
+                                let destinoLocation = CLLocation(latitude: latD, longitude: lonD)
+                                
+                                // Calcula distancia
+                                let distancia = inicioLocation.distance(from: destinoLocation)
+                                let distanciaKM = distancia / 1000
+                                let precoViagem = distanciaKM * precoKM
+                                
+                                let dadosAtualizar = [
+                                    "precoViagem" : precoViagem,
+                                    "distanciaPercorrida" : distanciaKM
+                                ]
+                                
+                                // Atualiza os dados da viagem no database
+                                snapshot.ref.updateChildValues(dadosAtualizar)
+                                
+                                // Atualiza requisicao no Database
+                                self.atualizarStatusRequisicao(status: self.status.rawValue)
+                                
+                                // Alternar para viagem finalizada
+                                self.configBotaoViagemFinalizada(preco: precoViagem)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func exibeMotoristaPassageiro(lPartida: CLLocationCoordinate2D, lDestino: CLLocationCoordinate2D, tPartida: String, tDestino: String) {
@@ -327,5 +377,20 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         self.botaAaceitarCorrida.setTitle("Finalizar Viagem", for: .normal)
         self.botaAaceitarCorrida.isEnabled = true
         self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.899, green: 0.899, blue: 0.0, alpha: 1)
+    }
+    
+    func configBotaoViagemFinalizada(preco: Double) {
+        self.botaAaceitarCorrida.isEnabled = false
+        self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.502, green: 0.502, blue: 0.502, alpha: 1)
+        
+        // Formata o número
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.maximumFractionDigits = 2
+        nf.locale = Locale(identifier: "pt_BR")
+        
+        let precoFinal = nf.string(from: NSNumber(value: preco))
+        
+        self.botaAaceitarCorrida.setTitle("Viagem finalizada - R$ " + precoFinal!, for: .normal)
     }
 }
