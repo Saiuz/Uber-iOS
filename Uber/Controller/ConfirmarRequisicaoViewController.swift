@@ -52,6 +52,50 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         anotacaoPassageiro.coordinate = self.localPassageiro
         anotacaoPassageiro.title = self.nomePassageiro
         mapa.addAnnotation(anotacaoPassageiro)
+        
+        // Recupera status e ajusta a interface
+        let requisicoes = Database.database().reference().child("requisicoes")
+        let consultaRequisicoes = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro)
+        
+        // Listener que verifica se houve alteração na requisição
+        consultaRequisicoes.observe(.childChanged) { (snapshot) in
+            if let dados = snapshot.value as? [String: Any] {
+                if let statusR = dados["status"] as? String {
+                    self.recarregarTelaStatus(status: statusR, dados: dados)
+                }
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        // Recupera status e ajusta a interface
+        let requisicoes = Database.database().reference().child("requisicoes")
+        let consultaRequisicoes = requisicoes.queryOrdered(byChild: "email").queryEqual(toValue: self.emailPassageiro)
+        
+        consultaRequisicoes.observeSingleEvent(of: .childAdded) { (snapshot) in
+            if let dados = snapshot.value as? [String: Any] {
+                if let statusR = dados["status"] as? String {
+                    self.recarregarTelaStatus(status: statusR, dados: dados)
+                }
+            }
+        }
+    }
+    
+    func recarregarTelaStatus(status: String, dados: [String: Any]) {
+        // Carrega a tela baseado nos status
+        if status == StatusCorrida.PegarPassageiro.rawValue {
+            print("status: PegarPassageiro")
+            self.pegarPassageiro()
+            
+            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Meu local", tDestino: "Passageiro")
+        } else if status == StatusCorrida.IniciarViagem.rawValue {
+            print("status: IniciarViagem")
+            // Modifica o botão da view
+            self.configBotaoIniciarViagem()
+            
+            // Exibir motorista passageiro
+            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Motorista", tDestino: "Passageiro")
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -92,22 +136,23 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                                 self.atualizarStatusRequisicao(status: StatusCorrida.IniciarViagem.rawValue)
                             }
                             
-                            self.pegarPassageiro()
-                            
-                            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Meu local", tDestino: "Passageiro")
-                            
                         } else if statusR == StatusCorrida.IniciarViagem.rawValue {
-                            self.configBotaoIniciarViagem()
                             
+                            //self.configBotaoIniciarViagem()
+                            
+                            // Exibir motorista passageiro
+                            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Motorista", tDestino: "Passageiro")
+                            
+                            /*
                             if let latDestino = dados["destinoLatitude"] as? Double {
                                 if let lonDestino = dados["destinoLongitude"] as? Double {
                                     // Configura o local de destino
                                     self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
                                     
-                                    // Exibir motorista passageiro
-                                    self.exibeMotoristaPassageiro(lPartida: self.localPassageiro, lDestino: self.localDestino, tPartida: "Motorista", tDestino: "Passageiro")
+                                    
                                 }
                             }
+                            */
                         }
                         
                         let dadosMotorista = [
