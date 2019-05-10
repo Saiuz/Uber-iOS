@@ -88,10 +88,20 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
             self.pegarPassageiro()
             
             self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Meu local", tDestino: "Passageiro")
+            
         } else if status == StatusCorrida.IniciarViagem.rawValue {
             print("status: IniciarViagem")
-            // Modifica o botão da view
+            // Modifica o status e o botão da view
+            self.status = .IniciarViagem
             self.configBotaoIniciarViagem()
+            
+            // Recupera o local de destino
+            if let latDestino = dados["destinoLatitude"] as? Double {
+                if let lonDestino = dados["destinoLongitude"] as? Double {
+                    // Configura o objeto de local de destino
+                    self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
+                }
+            }
             
             // Exibir motorista passageiro
             self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Motorista", tDestino: "Passageiro")
@@ -202,6 +212,32 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                         // Abre o recurso de rotas dentro do mapa
                         mapaItem.openInMaps(launchOptions: opcoes)
                     }
+                }
+            }
+        } else if self.status == StatusCorrida.IniciarViagem {
+            self.iniciarViagemDestino()
+        }
+    }
+    
+    func iniciarViagemDestino() {
+        // Atualiza o status
+        self.status = .EmViagem
+        
+        // Atualiza a requisição no database
+        self.atualizarStatusRequisicao(status: self.status.rawValue) // Para o database é necessário utilizar o rawValue para salvar como string
+        
+        // Exibir caminho para o destino no mapa
+        let destinoCLL = CLLocation(latitude: localDestino.latitude, longitude: localDestino.longitude)
+        
+        CLGeocoder().reverseGeocodeLocation(destinoCLL) { (local, erro) in
+            if erro == nil {
+                if let dadosLocal = local?.first {
+                    let placeMark = MKPlacemark(placemark: dadosLocal)
+                    let mapaItem = MKMapItem(placemark: placeMark)
+                    mapaItem.name = "Destino do Passeiro"
+                    
+                    let opcoes = [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving]
+                    mapaItem.openInMaps(launchOptions: opcoes)
                 }
             }
         }
