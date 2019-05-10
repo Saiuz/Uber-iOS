@@ -25,6 +25,7 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
     var emailPassageiro = ""
     var localPassageiro = CLLocationCoordinate2D()
     var localMotorista = CLLocationCoordinate2D()
+    var localDestino = CLLocationCoordinate2D()
     
     var status: StatusCorrida = .EmRequisicao // Cria uma var do tipo do enum
     
@@ -99,8 +100,20 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                             snapshot.ref.updateChildValues(dadosMotorista)
                             self.pegarPassageiro()
                             
+                            self.exibeMotoristaPassageiro(lPartida: self.localMotorista, lDestino: self.localPassageiro, tPartida: "Meu local", tDestino: "Passageiro")
+                            
                         } else if statusR == StatusCorrida.IniciarViagem.rawValue {
                             self.configBotaoIniciarViagem()
+                            
+                            if let latDestino = dados["destinoLatitude"] as? Double {
+                                if let lonDestino = dados["destinoLongitude"] as? Double {
+                                    // Configura o local de destino
+                                    self.localDestino = CLLocationCoordinate2D(latitude: latDestino, longitude: lonDestino)
+                                    
+                                    // Exibir motorista passageiro
+                                    self.exibeMotoristaPassageiro(lPartida: self.localPassageiro, lDestino: self.localDestino, tPartida: "Motorista", tDestino: "Passageiro")
+                                }
+                            }
                         }
                     }
                 }
@@ -153,6 +166,31 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         
         // Alterna o botão
         self.configBotaoPegarPassageiro()
+    }
+    
+    func exibeMotoristaPassageiro(lPartida: CLLocationCoordinate2D, lDestino: CLLocationCoordinate2D, tPartida: String, tDestino: String) {
+        // Exibir diretamente o passageiro e motorista no mapa
+        mapa.removeAnnotations(mapa.annotations)
+        
+        // Calcula um raio de distancia entre usuário e motorista para configurar no mapa uma distancia que apresente as duas localizações na tela
+        let latDiferenca = abs(lPartida.latitude - lDestino.latitude) * 300000 // abs = valor absoluto
+        let lonDiferenca = abs(lPartida.longitude - lDestino.longitude) * 300000
+        
+        // Cria a região para exibir no mapa
+        let regiao = MKCoordinateRegion(center: lPartida, latitudinalMeters: latDiferenca, longitudinalMeters: lonDiferenca)
+        mapa.setRegion(regiao, animated: true)
+        
+        // Anotacao partida
+        let anotacaoPartida = MKPointAnnotation()
+        anotacaoPartida.coordinate = lPartida
+        anotacaoPartida.title = tPartida
+        mapa.addAnnotation(anotacaoPartida)
+        
+        // Anotacao destino
+        let anotacaoDestino = MKPointAnnotation()
+        anotacaoDestino.coordinate = lDestino
+        anotacaoDestino.title = tDestino
+        mapa.addAnnotation(anotacaoDestino)
     }
     
     func configBotaoPegarPassageiro() {
