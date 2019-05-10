@@ -37,6 +37,9 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         gerenciadorLocalizacao.requestWhenInUseAuthorization() // Solicita autorização do usuário para usar a sua localização
         gerenciadorLocalizacao.startUpdatingLocation() // Começa a atualizar a localização do usuário
         
+        // Permite a atualização de localização em background (necessário add no info.plist)
+        gerenciadorLocalizacao.allowsBackgroundLocationUpdates = true
+        
         // Configura área inicial do mapa
         let regiao = MKCoordinateRegion(center: self.localPassageiro, latitudinalMeters: 200, longitudinalMeters: 200)
         
