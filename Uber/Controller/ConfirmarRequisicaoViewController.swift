@@ -71,14 +71,33 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
                         
                         // Status pegarPassageiro
                         if statusR == StatusCorrida.PegarPassageiro.rawValue { // rawValue para converter o enum em String
+                            
+                            /* Verifica se o Motorista está próximo, para iniciar a corrida */
+                            // Calcula distância entre motorista e passageiro
+                            let motoristaLocation = CLLocation(latitude: self.localMotorista.latitude, longitude: self.localMotorista.longitude)
+                            let passageiroLocation = CLLocation(latitude: self.localPassageiro.latitude, longitude: self.localPassageiro.longitude)
+                            
+                            // Faz o calculo de distancia
+                            let distancia = motoristaLocation.distance(from: passageiroLocation)
+                            let distanciaKM = distancia / 1000
+                            
+                            var novoStatus = self.status.rawValue
+                            if distanciaKM <= 0.5 {
+                                novoStatus = StatusCorrida.IniciarViagem.rawValue
+                            }
+                            
                             let dadosMotorista = [
                                 "motoristaLatitude" : self.localMotorista.latitude,
-                                "motoristaLongitude" : self.localMotorista.longitude
-                            ]
+                                "motoristaLongitude" : self.localMotorista.longitude,
+                                "status" : novoStatus
+                                ] as [String : Any]
                             
                             // Salvar dados no Database
                             snapshot.ref.updateChildValues(dadosMotorista)
                             self.pegarPassageiro()
+                            
+                        } else if statusR == StatusCorrida.IniciarViagem.rawValue {
+                            self.configBotaoIniciarViagem()
                         }
                     }
                 }
@@ -137,5 +156,11 @@ class ConfirmarRequisicaoViewController: UIViewController, CLLocationManagerDele
         self.botaAaceitarCorrida.setTitle("A caminho do passageiro", for: .normal)
         self.botaAaceitarCorrida.isEnabled = false
         self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.502, green: 0.502, blue: 0.502, alpha: 1)
+    }
+    
+    func configBotaoIniciarViagem() {
+        self.botaAaceitarCorrida.setTitle("Iniciar Viagem", for: .normal)
+        self.botaAaceitarCorrida.isEnabled = true
+        self.botaAaceitarCorrida.backgroundColor = UIColor(displayP3Red: 0.067, green: 0.576, blue: 0.604, alpha: 1)
     }
 }
